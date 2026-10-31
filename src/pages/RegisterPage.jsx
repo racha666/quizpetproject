@@ -1,11 +1,14 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'                          // ← НОВОЕ: useEffect
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import { isQuizSelectable, getQuizUnavailableReason } from '../utils/quizStatus'
 import { quizzes } from '../data/quizzes'
 import { captainTeams } from '../data/teams'
 import { currentUser } from '../data/currentUser'
 import { formatPhone } from '../utils/phone'
 import { validate } from '../utils/validation'
 import { submitRegistration } from '../api/registrations'
+import { fetchTemplates } from '../api/templates'                    // ← НОВОЕ
+import { useAuth } from '../context/useAuth'                         // ← НОВОЕ
 
 const INITIAL_FORM = {
   quizIds: [],
@@ -22,16 +25,82 @@ const INITIAL_FORM = {
 function RegisterPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const initialQuizId = Number(searchParams.get('quizId')) || null
+  const { user } = useAuth()
 
+  // ← НОВОЕ: находим квиз из URL и предвыбираем только если он существует и доступен
+  const initialQuizId = Number(searchParams.get('quizId'))
+  const initialQuiz = quizzes.find(q => q.id === initialQuizId)
+  const initialQuizIds =
+    initialQuiz && isQuizSelectable(initialQuiz) ? [initialQuiz.id] : []
   const [formData, setFormData] = useState({
     ...INITIAL_FORM,
-    quizIds: initialQuizId ? [initialQuizId] : [],
+    quizIds: initialQuizIds,   // ← было: initialQuizId ? [initialQuizId] : []
   })
   const [submitAttempted, setSubmitAttempted] = useState(false)
   const [status, setStatus] = useState('idle')
   const [errorMessage, setErrorMessage] = useState('')
   const [successData, setSuccessData] = useState(null)
+
+  // ===== НОВОЕ: шаблоны =====
+  const [templates, setTemplates] = useState(null) // null = ещё грузим
+  const [templatesError, setTemplatesError] = useState('')
+  const [selectedTemplateId, setSelectedTemplateId] = useState('')
+  const [appliedTemplateName, setAppliedTemplateName] = useState('')
+
+  // Загрузка шаблонов при монтировании (только если залогинен)
+useEffect(() => {
+  if (!user) return
+  let cancelled = false
+
+  fetchTemplates()
+    .then(data => {
+      if (cancelled) return
+      setTemplates(data)
+      setTemplatesError('')
+    })
+    .catch(err => {
+      if (cancelled) return
+      setTemplates([]) // чтобы не висел вечный null
+      setTemplatesError(err.message || 'Не удалось загрузить шаблоны')
+    })
+
+  return () => {
+    cancelled = true
+  }
+}, [user])
+
+  // Автосброс баннера «Шаблон применён» через 4 секунды
+  useEffect(() => {
+    if (!appliedTemplateName) return
+    const t = setTimeout(() => setAppliedTemplateName(''), 4000)
+    return () => clearTimeout(t)
+  }, [appliedTemplateName])
+
+  function handleApplyTemplate(templateIdValue) {
+    setSelectedTemplateId(templateIdValue)
+    if (!templateIdValue) return
+
+    const tpl = templates.find(t => t.id === Number(templateIdValue))
+    if (!tpl) return
+
+    setFormData(prev => {
+      // Команда из шаблона применяется, только если она всё ещё доступна (капитан)
+      const teamAvailable = tpl.teamId
+        ? captainTeams.some(t => t.id === tpl.teamId)
+        : false
+
+      return {
+        ...prev,
+        teamId: teamAvailable ? String(tpl.teamId) : prev.teamId,
+        participantsCount: tpl.participantsCount,
+        comment: tpl.comment,
+        hasBirthdayPerson: tpl.hasBirthdayPerson,
+      }
+    })
+    setAppliedTemplateName(tpl.name)
+  }
+  // ===== /НОВОЕ =====
+
   const errors = validate(formData)
   const hasErrors = Object.keys(errors).length > 0
 
@@ -51,6 +120,8 @@ function RegisterPage() {
       participantsCount: team ? team.template.participantsCount : 1,
       comment: team ? team.template.comment : '',
     }))
+    // Ручная смена команды «переопределяет» шаблон
+    setSelectedTemplateId('')                                       // ← НОВОЕ
   }
 
   function handleQuizToggle(quizId) {
@@ -62,13 +133,26 @@ function RegisterPage() {
     }))
   }
 
-  async function handleSubmit(e) {
-    e.preventDefault()
-    setSubmitAttempted(true)
-    if (hasErrors) return
+async function handleSubmit(e) {
+  e.preventDefault()
+  setSubmitAttempted(true)
+  if (hasErrors) return
 
-    setStatus('submitting')
-    setErrorMessage('')
+  // ← НОВОЕ: последний барьер — если в quizIds просочился недоступный квиз
+  const unavailable = formData.quizIds
+    .map(id => quizzes.find(q => q.id === id))
+    .filter(q => q && !isQuizSelectable(q))
+
+  if (unavailable.length > 0) {
+    setErrorMessage(
+      `Недоступны для регистрации: ${unavailable.map(q => q.title).join(', ')}`
+    )
+    setStatus('error')
+    return
+  }
+
+  setStatus('submitting')
+  setErrorMessage('')
 
     try {
       const result = await submitRegistration(formData)
@@ -85,6 +169,8 @@ function RegisterPage() {
     setSubmitAttempted(false)
     setSuccessData(null)
     setErrorMessage('')
+    setSelectedTemplateId('')                                       // ← НОВОЕ
+    setAppliedTemplateName('')                                      // ← НОВОЕ
   }
 
   function showError(field) {
@@ -93,7 +179,7 @@ function RegisterPage() {
 
   const isSubmitting = status === 'submitting'
 
-  // ===== Экран успеха =====
+  // ===== Экран успеха (без изменений) =====
   if (status === 'success' && successData) {
     return (
       <main className="container" style={{ paddingTop: '32px' }}>
@@ -127,7 +213,7 @@ function RegisterPage() {
     )
   }
 
-  // ===== Форма (idle / submitting / error) =====
+  // ===== Форма =====
   return (
     <main className="container" style={{ paddingTop: '32px' }}>
       <button
@@ -139,12 +225,69 @@ function RegisterPage() {
         ← Назад к квизам
       </button>
 
-      <h1 style={{ marginTop: '24px', textAlign: 'center' }}>Регистрация на квиз</h1>
+      <h1 style={{ marginTop: '24px', textAlign: 'center', fontFamily: 'var(--font-display)' }}>
+        Регистрация на квиз
+      </h1>
       <p style={{ color: 'var(--muted)', marginTop: '8px', textAlign: 'center' }}>
         Заполните форму — и мы зарегистрируем вас на выбранные квизы.
       </p>
 
       <form className="form" onSubmit={handleSubmit} noValidate>
+        {/* ===== НОВОЕ: баннер «шаблон применён» ===== */}
+        {appliedTemplateName && (
+          <div className="profile-success">
+            <span aria-hidden="true">✓</span>
+            Шаблон «{appliedTemplateName}» применён
+          </div>
+        )}
+
+        {/* ===== НОВОЕ: селект шаблонов ===== */}
+        {user && (
+          <div className="form__group">
+            <label className="form__label" htmlFor="template-apply">
+              Применить шаблон
+            </label>
+
+            {templates === null && (
+              <select className="form__select" disabled>
+                <option>Загрузка шаблонов...</option>
+              </select>
+            )}
+
+            {templatesError && (
+              <p className="form__error">{templatesError}</p>
+            )}
+
+            {templates !== null && !templatesError && templates.length === 0 && (
+              <p className="form__hint">
+                У вас нет шаблонов. Создайте их в{' '}
+                <a className="form__link" href="/account">личном кабинете</a> → «Шаблоны».
+              </p>
+            )}
+
+            {templates !== null && !templatesError && templates.length > 0 && (
+              <>
+                <select
+                  id="template-apply"
+                  className="form__select"
+                  value={selectedTemplateId}
+                  onChange={e => handleApplyTemplate(e.target.value)}
+                  disabled={isSubmitting}
+                >
+                  <option value="">— Не применять —</option>
+                  {templates.map(t => (
+                    <option key={t.id} value={t.id}>{t.name}</option>
+                  ))}
+                </select>
+                <p className="form__hint">
+                  Заполнит команду, количество участников, комментарий и именинника.
+                  Квизы и контакты останутся как есть.
+                </p>
+              </>
+            )}
+          </div>
+        )}
+
         {/* Ошибка сервера */}
         {status === 'error' && errorMessage && (
           <div className="error-banner">
@@ -153,7 +296,7 @@ function RegisterPage() {
           </div>
         )}
 
-        {/* Сводка ошибок валидации */}
+        {/* Сводка ошибок */}
         {submitAttempted && hasErrors && (
           <div className="form__summary">
             <strong>Проверьте форму:</strong>
@@ -165,8 +308,7 @@ function RegisterPage() {
           </div>
         )}
 
-        {/* ===== Все поля — как в шаге 6.3 ===== */}
-
+        {/* ===== Квизы ===== */}
         <div className="form__group">
           <label className="form__label form__label-required">
             Квиз {formData.quizIds.length > 0 && `(выбрано: ${formData.quizIds.length})`}
@@ -181,13 +323,13 @@ function RegisterPage() {
                   type="checkbox"
                   checked={formData.quizIds.includes(quiz.id)}
                   onChange={() => handleQuizToggle(quiz.id)}
-                  disabled={quiz.status === 'sold' || isSubmitting}
+                  disabled={!isQuizSelectable(quiz) || isSubmitting}
                 />
                 <div className="quiz-picker__text">
                   <div className="quiz-picker__title">{quiz.title}</div>
                   <div className="quiz-picker__meta">
                     {quiz.date} · {quiz.place} · {quiz.price}
-                    {quiz.status === 'sold' && ' · мест нет'}
+                    {!isQuizSelectable(quiz) && ` · ${getQuizUnavailableReason(quiz)}`}
                   </div>
                 </div>
               </label>
@@ -196,6 +338,7 @@ function RegisterPage() {
           {showError('quizIds') && <p className="form__error">{errors.quizIds}</p>}
         </div>
 
+        {/* ===== Команда ===== */}
         <div className="form__group">
           <label className="form__label form__label-required" htmlFor="team">
             Команда
@@ -221,6 +364,7 @@ function RegisterPage() {
           )}
         </div>
 
+        {/* ===== ФИО + Телефон ===== */}
         <div className="form__row">
           <div className="form__group">
             <label className="form__label form__label-required" htmlFor="fullName">
@@ -255,6 +399,7 @@ function RegisterPage() {
           </div>
         </div>
 
+        {/* ===== Email + Кол-во ===== */}
         <div className="form__row">
           <div className="form__group">
             <label className="form__label form__label-required" htmlFor="email">
@@ -295,6 +440,7 @@ function RegisterPage() {
           </div>
         </div>
 
+        {/* ===== Комментарий ===== */}
         <div className="form__group">
           <label className="form__label" htmlFor="comment">
             Комментарий
@@ -309,6 +455,7 @@ function RegisterPage() {
           />
         </div>
 
+        {/* ===== Именинник ===== */}
         <label className="form__checkbox-row">
           <input
             type="checkbox"
@@ -319,6 +466,7 @@ function RegisterPage() {
           <span>Есть именинник в команде</span>
         </label>
 
+        {/* ===== Согласие ===== */}
         <div>
           <label className="form__checkbox-row">
             <input
@@ -341,6 +489,7 @@ function RegisterPage() {
           )}
         </div>
 
+        {/* ===== Действия ===== */}
         <div className="form__actions">
           <button
             className="btn btn--ghost"
@@ -350,7 +499,11 @@ function RegisterPage() {
           >
             Отмена
           </button>
-          <button className="btn btn--primary" type="submit" disabled={isSubmitting}>
+          <button
+            className="btn btn--primary"
+            type="submit"
+            disabled={isSubmitting}
+          >
             {isSubmitting ? (
               <>
                 <span className="btn__spinner" aria-hidden="true"></span>

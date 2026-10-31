@@ -1,19 +1,22 @@
-const HANKO = {
-  open: '空',
-  few: '少',
-  sold: '満',
-}
+import { getQuizBadge, getQuizAction } from '../utils/quizStatus'
 
 function QuizCard({ quiz, onRegister }) {
+  const badge = getQuizBadge(quiz)
+  const action = getQuizAction(quiz)
+  const badgeTitle =
+    quiz.lifecycle === 'cancelled' && quiz.cancellationReason
+      ? quiz.cancellationReason
+      : undefined
+
   return (
     <article className="card">
       <div className="card__cover" style={{ background: quiz.cover }}>
         <span className="card__genre">{quiz.genre}</span>
-        <span className={`badge badge--${quiz.status}`}>
+        <span className={`badge ${badge.className}`} title={badgeTitle}>
           <span className="badge__hanko" aria-hidden="true">
-            {HANKO[quiz.status] || '？'}
+            {badge.kanji}
           </span>
-          {quiz.statusText}
+          {badge.text}
         </span>
       </div>
 
@@ -56,10 +59,10 @@ function QuizCard({ quiz, onRegister }) {
           <button
             className="btn btn--primary"
             type="button"
-            disabled={quiz.status === 'sold'}
+            disabled={action.disabled}
             onClick={() => onRegister(quiz.id)}
           >
-            {quiz.status === 'sold' ? 'Мест нет' : 'Регистрация'}
+            {action.label}
           </button>
         </div>
       </div>

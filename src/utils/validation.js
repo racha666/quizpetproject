@@ -1,9 +1,24 @@
+import { quizzes } from '../data/quizzes'
+import { isQuizSelectable } from './quizStatus'
+
 export function validate(formData) {
   const errors = {}
 
   // Квизы: хотя бы один
   if (formData.quizIds.length === 0) {
     errors.quizIds = 'Выберите хотя бы один квиз'
+  } else {
+    // ← НОВОЕ: проверяем, что все выбранные квизы существуют и доступны
+    const unavailable = formData.quizIds
+      .map(id => quizzes.find(q => q.id === id))
+      .filter(q => !q || !isQuizSelectable(q))
+
+    if (unavailable.length > 0) {
+      errors.quizIds =
+        unavailable.length === 1
+          ? 'Один из выбранных квизов недоступен для регистрации'
+          : 'Некоторые выбранные квизы недоступны для регистрации'
+    }
   }
 
   // Команда: обязательна
