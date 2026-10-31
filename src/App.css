@@ -1879,3 +1879,50 @@
   font-size: 13px;
   padding: 8px 14px;
 }
+
+/* ===== Error Boundary (T17) ===== */
+.error-boundary {
+  display: grid;
+  place-items: center;
+  min-height: 50vh;
+  padding: 40px 24px;
+}
+
+.error-boundary__inner {
+  background: var(--card);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius);
+  padding: 40px 32px;
+  max-width: 520px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-gold);
+}
+
+.error-boundary__icon {
+  font-size: 48px;
+  color: var(--danger);
+  margin-bottom: 16px;
+  line-height: 1;
+}
+
+.error-boundary__title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.error-boundary__text {
+  color: var(--muted);
+  font-size: 14.5px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.error-boundary__actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}

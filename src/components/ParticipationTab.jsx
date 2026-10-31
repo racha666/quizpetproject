@@ -13,6 +13,9 @@ const STATUS = {
 }
 
 function ParticipationCard({ participation }) {
+  if (participation.id === 1) {
+    throw new Error('Тест Error Boundary')
+  }
   const quiz = quizzes.find(q => q.id === participation.quizId) || null
   const status = STATUS[participation.status] || STATUS.planned
 
