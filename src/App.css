@@ -1856,3 +1856,26 @@
   color: var(--text);
   line-height: 1.6;
 }
+
+/* ← НОВОЕ: панель капитана в карточке участия */
+.participation-card__captain-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.participation-card__upload-error {
+  background: rgba(214, 69, 69, 0.08);
+  border: 1px solid rgba(214, 69, 69, 0.3);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 12.5px;
+  color: #f5a0a0;
+}
+
+.participation-card__captain-panel .btn {
+  font-size: 13px;
+  padding: 8px 14px;
+}
