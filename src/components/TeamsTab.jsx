@@ -3,6 +3,7 @@ import TeamCard from './TeamCard'
 import TeamForm from './TeamForm'
 import ConfirmDialog from './ConfirmDialog'
 import { fetchTeams, createTeam, updateTeam, deleteTeam } from '../api/teams'
+import TeamCardSkeleton from './TeamCardSkeleton'
 
 function TeamsTab() {
   const [teams, setTeams] = useState([])
@@ -103,9 +104,18 @@ function TeamsTab() {
   // ===== Loading =====
   if (loadStatus === 'loading') {
     return (
-      <div className="teams-loading">
-        <span className="btn__spinner" aria-hidden="true"></span>
-        Загружаем команды...
+      <div>
+        <div className="teams-header">
+          <div>
+            <h3 className="teams-header__title">Мои команды</h3>
+            <p className="teams-header__subtitle">Загрузка...</p>
+          </div>
+        </div>
+       <div className="teams-grid">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <TeamCardSkeleton key={i} />
+          ))}
+        </div>
       </div>
     )
   }

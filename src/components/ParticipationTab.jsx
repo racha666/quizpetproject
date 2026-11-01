@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { fetchParticipations, uploadResults } from '../api/participations'   // ← добавили uploadResults
 import { quizzes } from '../data/quizzes'
 import ConfirmDialog from './ConfirmDialog'                                  // ← НОВОЕ
+import ParticipationCardSkeleton from './ParticipationCardSkeleton'
 
 // ← НОВОЕ: словарь статусов участия (не путать со статусами квиза из quizStatus.js)
 const STATUS = {
@@ -13,9 +14,12 @@ const STATUS = {
 }
 
 function ParticipationCard({ participation }) {
+  //Принудительно вызвать ошибку
+  /*
   if (participation.id === 1) {
     throw new Error('Тест Error Boundary')
   }
+  */
   const quiz = quizzes.find(q => q.id === participation.quizId) || null
   const status = STATUS[participation.status] || STATUS.planned
 
@@ -210,9 +214,18 @@ function ParticipationTab() {
   // ── Состояния ────────────────────────────────────────────
   if (status === 'loading') {
     return (
-      <div className="teams-loading">
-        <span className="btn__spinner" aria-hidden="true"></span>
-        Загружаем участия...
+      <div>
+        <div className="teams-header">
+          <div>
+            <h3 className="teams-header__title">Мои участия</h3>
+            <p className="teams-header__subtitle">Загрузка...</p>
+          </div>
+        </div>
+        <div className="participations-grid">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <ParticipationCardSkeleton key={i} />
+          ))}
+        </div>
       </div>
     )
   }
