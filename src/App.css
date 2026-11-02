@@ -2269,3 +2269,66 @@
   border-color: var(--border-gold);
   box-shadow: 0 0 24px rgba(201, 169, 97, 0.08);
 }
+/* ===== PlansTab: удаление подборки, X на углу ===== */
+.plan-tab-card-wrapper {
+  position: relative;
+  transition: transform 0.3s;
+}
+
+.plan-tab-card-wrapper:hover {
+  transform: translateY(-6px);
+}
+
+.plan-tab-remove {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(15, 13, 26, 0.92);
+  border: 1px solid rgba(214, 69, 69, 0.5);
+  color: var(--danger);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  backdrop-filter: blur(4px);
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+}
+
+.plan-tab-remove:hover {
+  background: rgba(214, 69, 69, 0.25);
+  border-color: var(--danger);
+  transform: scale(1.1);
+}
+
+.plan-card__empty {
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* ===== PlanPage: X у квиза — на углу, не на жанре ===== */
+.plan-quiz-wrapper {
+  position: relative;
+  transition: transform 0.3s;
+}
+
+.plan-quiz-wrapper:hover {
+  transform: translateY(-6px);
+}
+
+.plan-quiz-wrapper:hover .card {
+  transform: none;
+}
+
+/* переопределяем старое положение (left: 8px) */
+.plan-quiz-remove {
+  top: -10px;
+  right: -10px;
+  left: auto;
+  width: 26px;
+  height: 26px;
+}

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { getQuizBadge, getQuizAction } from '../utils/quizStatus'
 import AddToPlanDialog from './AddToPlanDialog'
+import { buildGoogleCalendarUrl } from '../utils/googleCalendar'
 
 function QuizCard({ quiz, onRegister }) {
   const [planDialogOpen, setPlanDialogOpen] = useState(false)
@@ -75,6 +76,23 @@ function QuizCard({ quiz, onRegister }) {
             onClick={() => setPlanDialogOpen(true)}
             title="Добавить в подборку"
           >
+          <a
+            className="btn btn--ghost card__plan-btn"
+            href={buildGoogleCalendarUrl(quiz) || '#'}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Добавить в Google Calendar"
+            aria-label="Добавить в Google Calendar"
+            style={{ opacity: quiz.dateISO ? 1 : 0.3, pointerEvents: quiz.dateISO ? 'auto' : 'none' }}
+          >
+            📅
+          </a>
+          <button
+            className="btn btn--ghost card__plan-btn"
+            type="button"
+            onClick={() => setPlanDialogOpen(true)}
+            title="Добавить в подборку"
+          ></button>
             ＋
           </button>
           <button
