@@ -481,6 +481,40 @@
   letter-spacing: 0.05em;
 }
 
+/* Действия на обложке: календарь + подборка */
+.card__actions {
+  position: absolute;
+  bottom: 10px;
+  left: 12px;
+  z-index: 2;
+  display: flex;
+  gap: 6px;
+}
+
+.card__icon-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  background: rgba(15, 13, 26, 0.85);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(201, 169, 97, 0.3);
+  color: var(--text);
+  font-size: 14px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  text-decoration: none;
+  padding: 0;
+  line-height: 1;
+  font-family: var(--font-body);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.card__icon-btn:hover {
+  border-color: var(--gold-bright);
+  background: rgba(15, 13, 26, 0.95);
+}
+
 /* Ханко-печать (бейдж статуса) */
 .badge {
   position: absolute;
@@ -539,7 +573,6 @@
   flex: none;
 }
 
-/* ← НОВОЕ: ханко под новые классы badge--ok / warn / muted / danger */
 .badge--ok .badge__hanko {
   background: linear-gradient(135deg, var(--ok), #4a8a4e);
   box-shadow: 0 0 10px rgba(123, 196, 127, 0.4);
@@ -633,6 +666,33 @@
   gap: 10px;
   margin-top: auto;
   padding-top: 4px;
+}
+
+.card__footer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.card__difficulty {
+  font-size: 12px;
+  color: var(--gold-bright);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.card__difficulty-label {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+  margin-right: 4px;
+}
+
+.card__difficulty-dim {
+  color: var(--muted);
+  font-size: 11px;
 }
 
 .card__price {
@@ -755,7 +815,7 @@
   }
 }
 
-/* ===== Registration form (адаптация под новый стиль) ===== */
+/* ===== Registration form ===== */
 .form {
   background: var(--card);
   border: 1px solid var(--border-gold);
@@ -1092,7 +1152,7 @@
   }
 }
 
-/* ===== Profile (view mode) ===== */
+/* ===== Profile ===== */
 .profile-card {
   background: var(--card);
   border: 1px solid var(--border-gold);
@@ -1472,6 +1532,10 @@
   animation: slideUp 0.2s ease;
 }
 
+.dialog--wide {
+  max-width: 520px;
+}
+
 @keyframes slideUp {
   from {
     opacity: 0;
@@ -1789,7 +1853,7 @@
   background: linear-gradient(135deg, #6a6a6a, #3a3a3a);
 }
 
-/* ← НОВОЕ: аккордеон «Подробнее» */
+/* Аккордеон «Подробнее» */
 .participation-card__details {
   border-top: 1px solid var(--border);
   padding-top: 12px;
@@ -1857,7 +1921,7 @@
   line-height: 1.6;
 }
 
-/* ← НОВОЕ: панель капитана в карточке участия */
+/* Панель капитана в карточке участия */
 .participation-card__captain-panel {
   display: flex;
   flex-direction: column;
@@ -2100,19 +2164,7 @@
   }
 }
 
-.card__difficulty-label {
-  font-size: 11px;
-  color: var(--muted);
-  font-family: var(--font-display);
-  letter-spacing: 0.04em;
-  margin-right: 4px;
-}
-
 /* ===== QuizPlans (T21) ===== */
-.dialog--wide {
-  max-width: 520px;
-}
-
 .add-to-plan__list {
   display: flex;
   flex-direction: column;
@@ -2163,14 +2215,6 @@
   flex: 1;
 }
 
-.card__plan-btn {
-  padding: 8px 10px;
-  font-size: 16px;
-  line-height: 1;
-  flex: none;
-  font-weight: 400;
-}
-
 .plan-card__list {
   list-style: none;
   padding: 0;
@@ -2193,6 +2237,11 @@
 
 .plan-card__more {
   color: var(--gold);
+  font-style: italic;
+}
+
+.plan-card__empty {
+  color: var(--muted);
   font-style: italic;
 }
 
@@ -2226,31 +2275,41 @@
 
 .plan-quiz-wrapper {
   position: relative;
+  transition: transform 0.3s;
+}
+
+.plan-quiz-wrapper:hover {
+  transform: translateY(-6px);
+}
+
+.plan-quiz-wrapper:hover .card {
+  transform: none;
 }
 
 .plan-quiz-remove {
   position: absolute;
-  top: 8px;
-  left: 8px;
-  width: 30px;
-  height: 30px;
+  top: -10px;
+  right: -10px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  background: rgba(15, 13, 26, 0.85);
+  background: rgba(15, 13, 26, 0.92);
   border: 1px solid rgba(214, 69, 69, 0.5);
   color: var(--danger);
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1;
   cursor: pointer;
   z-index: 3;
   display: grid;
   place-items: center;
   backdrop-filter: blur(4px);
-  transition: background 0.2s, border-color 0.2s;
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
 }
 
 .plan-quiz-remove:hover:not(:disabled) {
-  background: rgba(214, 69, 69, 0.2);
+  background: rgba(214, 69, 69, 0.25);
   border-color: var(--danger);
+  transform: scale(1.1);
 }
 
 .plan-quiz-remove:disabled {
@@ -2269,6 +2328,7 @@
   border-color: var(--border-gold);
   box-shadow: 0 0 24px rgba(201, 169, 97, 0.08);
 }
+
 /* ===== PlansTab: удаление подборки, X на углу ===== */
 .plan-tab-card-wrapper {
   position: relative;
@@ -2303,32 +2363,4 @@
   background: rgba(214, 69, 69, 0.25);
   border-color: var(--danger);
   transform: scale(1.1);
-}
-
-.plan-card__empty {
-  color: var(--muted);
-  font-style: italic;
-}
-
-/* ===== PlanPage: X у квиза — на углу, не на жанре ===== */
-.plan-quiz-wrapper {
-  position: relative;
-  transition: transform 0.3s;
-}
-
-.plan-quiz-wrapper:hover {
-  transform: translateY(-6px);
-}
-
-.plan-quiz-wrapper:hover .card {
-  transform: none;
-}
-
-/* переопределяем старое положение (left: 8px) */
-.plan-quiz-remove {
-  top: -10px;
-  right: -10px;
-  left: auto;
-  width: 26px;
-  height: 26px;
 }

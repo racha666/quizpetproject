@@ -12,6 +12,8 @@ function QuizCard({ quiz, onRegister }) {
       ? quiz.cancellationReason
       : undefined
 
+  const gcalUrl = buildGoogleCalendarUrl(quiz)
+
   return (
     <article className="card">
       <div className="card__cover" style={{ background: quiz.cover }}>
@@ -22,6 +24,30 @@ function QuizCard({ quiz, onRegister }) {
           </span>
           {badge.text}
         </span>
+
+        <div className="card__actions">
+          {gcalUrl && (
+            <a
+              className="card__icon-btn"
+              href={gcalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Добавить в Google Calendar"
+              aria-label="Добавить в Google Calendar"
+            >
+              📅
+            </a>
+          )}
+          <button
+            className="card__icon-btn"
+            type="button"
+            onClick={() => setPlanDialogOpen(true)}
+            title="Добавить в подборку"
+            aria-label="Добавить в подборку"
+          >
+            ＋
+          </button>
+        </div>
       </div>
 
       <div className="card__body">
@@ -56,45 +82,24 @@ function QuizCard({ quiz, onRegister }) {
         </div>
 
         <div className="card__footer">
-        <span
-          className="card__difficulty"
-          title={`Сложность: ${quiz.difficulty} из 5`}
-        >
-          <span className="card__difficulty-label">Сложность:</span>
-          {'★'.repeat(quiz.difficulty)}
-          <span className="card__difficulty-dim">
-            {quiz.difficulty < 5 ? ` (${quiz.difficulty}/5)` : ''}
-          </span>
-        </span>
-          <span className={`card__price ${quiz.free ? 'card__price--free' : ''}`}>
-            {quiz.price}
-            {!quiz.free && <small> / человек</small>}
-          </span>
-          <button
-            className="btn btn--ghost card__plan-btn"
-            type="button"
-            onClick={() => setPlanDialogOpen(true)}
-            title="Добавить в подборку"
-          >
-          <a
-            className="btn btn--ghost card__plan-btn"
-            href={buildGoogleCalendarUrl(quiz) || '#'}
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Добавить в Google Calendar"
-            aria-label="Добавить в Google Calendar"
-            style={{ opacity: quiz.dateISO ? 1 : 0.3, pointerEvents: quiz.dateISO ? 'auto' : 'none' }}
-          >
-            📅
-          </a>
-          <button
-            className="btn btn--ghost card__plan-btn"
-            type="button"
-            onClick={() => setPlanDialogOpen(true)}
-            title="Добавить в подборку"
-          ></button>
-            ＋
-          </button>
+          <div className="card__footer-info">
+            <span
+              className="card__difficulty"
+              title={`Сложность: ${quiz.difficulty} из 5`}
+            >
+              <span className="card__difficulty-label">Сложность:</span>
+              {'★'.repeat(quiz.difficulty)}
+              {quiz.difficulty < 5 && (
+                <span className="card__difficulty-dim">
+                  {' '}({quiz.difficulty}/5)
+                </span>
+              )}
+            </span>
+            <span className={`card__price ${quiz.free ? 'card__price--free' : ''}`}>
+              {quiz.price}
+              {!quiz.free && <small> / человек</small>}
+            </span>
+          </div>
           <button
             className="btn btn--primary"
             type="button"
@@ -105,6 +110,7 @@ function QuizCard({ quiz, onRegister }) {
           </button>
         </div>
       </div>
+
       {planDialogOpen && (
         <AddToPlanDialog
           quiz={quiz}
