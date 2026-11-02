@@ -4,6 +4,7 @@ function ConfirmDialog({
   title,
   message,
   confirmLabel = 'Подтвердить',
+  loadingLabel = 'Загрузка...',   // ← НОВОЕ
   cancelLabel = 'Отмена',
   onConfirm,
   onCancel,
@@ -42,7 +43,7 @@ function ConfirmDialog({
             {isLoading ? (
               <>
                 <span className="btn__spinner" aria-hidden="true"></span>
-                Удаляем...
+                {loadingLabel}
               </>
             ) : (
               confirmLabel

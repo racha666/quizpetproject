@@ -4,11 +4,13 @@ import { useAuth } from '../context/useAuth'
 import ProfileTab from '../components/ProfileTab'
 import TeamsTab from '../components/TeamsTab'
 import TemplatesTab from '../components/TemplatesTab'
-import ParticipationTab from '../components/ParticipationTab'   // ← НОВОЕ
+import ParticipationTab from '../components/ParticipationTab'
+import PlansTab from '../components/PlansTab'
 
 const TABS = [
   { key: 'profile', label: 'Профиль' },
-  { key: 'participation', label: 'Участие' },   // ← НОВОЕ
+  { key: 'participation', label: 'Участие' },
+  { key: 'plans', label: 'Подборки' },
   { key: 'teams', label: 'Команды' },
   { key: 'templates', label: 'Шаблоны' },
 ]
@@ -51,7 +53,8 @@ function AccountPage() {
         }}
       >
         {activeTab === 'profile' && <ProfileTab />}
-        {activeTab === 'participation' && <ParticipationTab />}   {/* ← НОВОЕ */}
+        {activeTab === 'participation' && <ParticipationTab />}
+        {activeTab === 'plans' && <PlansTab />}
         {activeTab === 'teams' && <TeamsTab />}
         {activeTab === 'templates' && <TemplatesTab />}
       </div>

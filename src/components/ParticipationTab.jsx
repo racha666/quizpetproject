@@ -162,6 +162,7 @@ function ParticipationCard({ participation }) {
           title="Загрузить результаты?"
           message={`Результаты для «${quiz ? quiz.title : 'квиза'}» будут загружены. Это действие нельзя отменить.`}
           confirmLabel="Загрузить"
+          loadingLabel="Загружаем..."
           onConfirm={handleConfirmUpload}
           onCancel={() => setDialogOpen(false)}
           isLoading={uploadStatus === 'uploading'}

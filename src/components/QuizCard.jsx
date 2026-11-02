@@ -1,6 +1,9 @@
+import { useState } from 'react'
 import { getQuizBadge, getQuizAction } from '../utils/quizStatus'
+import AddToPlanDialog from './AddToPlanDialog'
 
 function QuizCard({ quiz, onRegister }) {
+  const [planDialogOpen, setPlanDialogOpen] = useState(false)
   const badge = getQuizBadge(quiz)
   const action = getQuizAction(quiz)
   const badgeTitle =
@@ -52,10 +55,28 @@ function QuizCard({ quiz, onRegister }) {
         </div>
 
         <div className="card__footer">
+        <span
+          className="card__difficulty"
+          title={`Сложность: ${quiz.difficulty} из 5`}
+        >
+          <span className="card__difficulty-label">Сложность:</span>
+          {'★'.repeat(quiz.difficulty)}
+          <span className="card__difficulty-dim">
+            {quiz.difficulty < 5 ? ` (${quiz.difficulty}/5)` : ''}
+          </span>
+        </span>
           <span className={`card__price ${quiz.free ? 'card__price--free' : ''}`}>
             {quiz.price}
-            {!quiz.free && <small> / команда</small>}
+            {!quiz.free && <small> / человек</small>}
           </span>
+          <button
+            className="btn btn--ghost card__plan-btn"
+            type="button"
+            onClick={() => setPlanDialogOpen(true)}
+            title="Добавить в подборку"
+          >
+            ＋
+          </button>
           <button
             className="btn btn--primary"
             type="button"
@@ -66,6 +87,12 @@ function QuizCard({ quiz, onRegister }) {
           </button>
         </div>
       </div>
+      {planDialogOpen && (
+        <AddToPlanDialog
+          quiz={quiz}
+          onClose={() => setPlanDialogOpen(false)}
+        />
+      )}
     </article>
   )
 }

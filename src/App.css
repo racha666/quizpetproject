@@ -1951,3 +1951,321 @@
     background: var(--bg-soft);
   }
 }
+
+/* ===== FiltersBar — компактные фильтры ===== */
+.filters-bar {
+  max-width: 1240px;
+  margin: 8px auto 0;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filters-bar__group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filters-bar__label {
+  font-family: var(--font-display);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.filters-bar__select {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 13px;
+  padding: 8px 30px 8px 12px;
+  font-family: var(--font-body);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a8296' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  transition: border-color 0.2s;
+}
+
+.filters-bar__select:focus {
+  outline: none;
+  border-color: var(--gold-dim);
+  box-shadow: 0 0 0 2px rgba(201, 169, 97, 0.15);
+}
+
+.filters-bar__group--search {
+  flex: 1;
+  min-width: 240px;
+  position: relative;
+}
+
+.filters-bar__search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.filters-bar__input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 36px 8px 34px;
+  font-size: 13px;
+  color: var(--text);
+  font-family: var(--font-body);
+  transition: border-color 0.2s;
+}
+
+.filters-bar__input:focus {
+  outline: none;
+  border-color: var(--gold-dim);
+  box-shadow: 0 0 0 2px rgba(201, 169, 97, 0.15);
+}
+
+.filters-bar__input::placeholder {
+  color: var(--muted);
+}
+
+.filters-bar__clear {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: var(--bg-soft);
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.filters-bar__clear:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.filters-bar__reset {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  white-space: nowrap;
+}
+
+.filters-bar__reset:hover {
+  color: var(--text);
+  border-color: var(--gold-dim);
+}
+
+.filters-bar__count {
+  font-size: 12px;
+  color: var(--muted);
+  font-family: var(--font-display);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  margin-left: auto;
+}
+
+@media (max-width: 760px) {
+  .filters-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filters-bar__count {
+    margin-left: 0;
+    text-align: right;
+  }
+}
+
+.card__difficulty-label {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+  margin-right: 4px;
+}
+
+/* ===== QuizPlans (T21) ===== */
+.dialog--wide {
+  max-width: 520px;
+}
+
+.add-to-plan__list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 220px;
+  overflow-y: auto;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  margin-bottom: 14px;
+}
+
+.add-to-plan__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 13.5px;
+  transition: background 0.15s;
+}
+
+.add-to-plan__item:hover {
+  background: var(--bg-soft);
+}
+
+.add-to-plan__item input[type='checkbox'] {
+  accent-color: var(--gold);
+  width: 16px;
+  height: 16px;
+}
+
+.add-to-plan__count {
+  margin-left: auto;
+  font-size: 11.5px;
+  color: var(--muted);
+  font-family: var(--font-display);
+}
+
+.add-to-plan__create {
+  display: flex;
+  gap: 8px;
+}
+
+.add-to-plan__create .form__input {
+  flex: 1;
+}
+
+.card__plan-btn {
+  padding: 8px 10px;
+  font-size: 16px;
+  line-height: 1;
+  flex: none;
+  font-weight: 400;
+}
+
+.plan-card__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.plan-card__list li {
+  padding: 3px 0;
+  border-bottom: 1px dashed var(--border);
+}
+
+.plan-card__list li:last-child {
+  border-bottom: none;
+}
+
+.plan-card__more {
+  color: var(--gold);
+  font-style: italic;
+}
+
+/* ===== PlanPage (T21.4) ===== */
+.plan-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 24px 0 20px;
+  flex-wrap: wrap;
+}
+
+.plan-header__title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.plan-header__subtitle {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.plan-quizzes {
+  display: grid;
+  gap: 22px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.plan-quiz-wrapper {
+  position: relative;
+}
+
+.plan-quiz-remove {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(15, 13, 26, 0.85);
+  border: 1px solid rgba(214, 69, 69, 0.5);
+  color: var(--danger);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  backdrop-filter: blur(4px);
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.plan-quiz-remove:hover:not(:disabled) {
+  background: rgba(214, 69, 69, 0.2);
+  border-color: var(--danger);
+}
+
+.plan-quiz-remove:disabled {
+  opacity: 0.4;
+  cursor: wait;
+}
+
+.team-card--link {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  display: block;
+}
+
+.team-card--link:hover {
+  border-color: var(--border-gold);
+  box-shadow: 0 0 24px rgba(201, 169, 97, 0.08);
+}

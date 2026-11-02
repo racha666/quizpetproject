@@ -1,20 +1,21 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { fetchQuizzes } from '../api/quizzes'                          // ← было: import { quizzes } from '../data/quizzes'
+import { fetchQuizzes } from '../api/quizzes'
 import Hero from '../components/Hero'
-import FilterChips from '../components/FilterChips'
+import FiltersBar from '../components/FiltersBar'         // ← было FilterChips
 import QuizCard from '../components/QuizCard'
-import QuizCardSkeleton from '../components/QuizCardSkeleton'          // ← НОВОЕ
+import QuizCardSkeleton from '../components/QuizCardSkeleton'
 
 function HomePage() {
   const [activeFilter, setActiveFilter] = useState('all')
-  const [quizzes, setQuizzes] = useState(null)                         // ← НОВОЕ
-  const [status, setStatus] = useState('loading')                      // ← НОВОЕ
-  const [error, setError] = useState('')                               // ← НОВОЕ
-  const [reloadToken, setReloadToken] = useState(0)                    // ← НОВОЕ
+  const [searchQuery, setSearchQuery] = useState('')
+  const [quizzes, setQuizzes] = useState(null)
+  const [status, setStatus] = useState('loading')
+  const [error, setError] = useState('')
+  const [reloadToken, setReloadToken] = useState(0)
   const navigate = useNavigate()
 
-  useEffect(() => {                                                    // ← НОВОЕ
+  useEffect(() => {
     let cancelled = false
 
     fetchQuizzes()
@@ -32,7 +33,7 @@ function HomePage() {
     return () => { cancelled = true }
   }, [reloadToken])
 
-  function handleRetry() {                                             // ← НОВОЕ
+  function handleRetry() {
     setStatus('loading')
     setError('')
     setReloadToken(t => t + 1)
@@ -42,16 +43,31 @@ function HomePage() {
     navigate(`/register?quizId=${quizId}`)
   }
 
-  const filteredQuizzes = !quizzes                                     // ← НОВОЕ: безопасный fallback пока null
+  const filteredQuizzes = !quizzes
     ? []
-    : activeFilter === 'all'
-      ? quizzes
-      : quizzes.filter(q => q.theme === activeFilter)
+    : quizzes
+        .filter(q => activeFilter === 'all' || q.difficulty === activeFilter)
+        .filter(q => {
+          const ql = searchQuery.trim().toLowerCase()
+          if (!ql) return true
+          return (
+            q.title.toLowerCase().includes(ql) ||
+            q.organizer.toLowerCase().includes(ql) ||
+            q.tags.some(t => t.toLowerCase().includes(ql))
+          )
+        })
 
   return (
     <>
       <Hero />
-      <FilterChips activeFilter={activeFilter} onChange={setActiveFilter} />
+      <FiltersBar
+        activeFilter={activeFilter}
+        onFilterChange={setActiveFilter}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        resultCount={filteredQuizzes.length}
+        totalCount={quizzes ? quizzes.length : 0}
+      />
 
       <main className="container">
         {status === 'loading' && (
@@ -88,7 +104,9 @@ function HomePage() {
 
             {filteredQuizzes.length === 0 && (
               <p style={{ color: 'var(--muted)', textAlign: 'center', padding: '40px 0' }}>
-                По этому фильтру квизов пока нет 😔
+                {searchQuery.trim()
+                  ? `По запросу «${searchQuery}» ничего не найдено 😔`
+                  : 'По этому фильтру квизов пока нет 😔'}
               </p>
             )}
           </>
